@@ -1,3 +1,8 @@
+# Helpful resources ============================================================
+# https://math.ucr.edu/~res/math153/history07d.pdf
+# https://math.stackexchange.com/questions/1205927/how-to-calculate-the-area-covered-by-any-spherical-rectangle
+
+
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +16,7 @@ def main():
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(projection='3d')
 
-    u, v = get_uv()
+    u, v = get_uv(False)
 
     x = np.cos(u) * np.sin(v)
     y = np.sin(u) * np.sin(v)
@@ -21,7 +26,8 @@ def main():
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(-1, 1.2)
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
+    ax.set_box_aspect([1,1,1])
 
     plt.show()
 
