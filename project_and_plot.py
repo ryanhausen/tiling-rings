@@ -1,9 +1,11 @@
 # Helpful resources ============================================================
 # https://math.ucr.edu/~res/math153/history07d.pdf
 # https://math.stackexchange.com/questions/1205927/how-to-calculate-the-area-covered-by-any-spherical-rectangle
+# https://www.wolframcloud.com/objects/demonstrations/TangentPlaneToASphere-source.nb
 
 
-
+from collections import namedtuple
+from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import axes3d
@@ -11,12 +13,13 @@ from mpl_toolkits.mplot3d import axes3d
 from rings import build_rings
 
 d2r = np.pi / 180
+Point = namedtuple("Point", ["x", "y", "z"])
 
 def main():
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(projection='3d')
-
-    u, v = get_uv(False)
+    a = 3.955
+    u, v = get_uv(a_deg=a, semicircle=True)
 
     x = np.cos(u) * np.sin(v)
     y = np.sin(u) * np.sin(v)
@@ -26,8 +29,42 @@ def main():
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(-1, 1.2)
-    # ax.set_aspect("equal")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
     ax.set_box_aspect([1,1,1])
+
+    up, vp = u[100], v[100]
+    a *= d2r
+    us, vs = list(map(np.array, zip(*product([up-a/2, up+a/2], [vp-a/2, vp+a/2]))))
+
+
+
+    xs, ys = np.meshgrid(np.linspace(-1, 1, 100), np.linspace(-1, 1, 100))
+
+    dfdx = lambda _x: 2*_x
+    dfdy = lambda _y: 2*_y
+    dfdz = lambda _z: 2*_z
+
+    p = Point(
+        np.cos(up) * np.sin(vp), # x
+        np.sin(up) * np.sin(vp), # y
+        np.cos(vp)               # z
+    )
+
+    zs = (-dfdx(p.x) * (xs - p.x) - dfdy(p.y) * (ys - p.y)) / dfdz(p.z) + p.z
+
+    ax.plot_surface(xs, ys, zs)
+
+    x = np.cos(us) * np.sin(vs)
+    y = np.sin(us) * np.sin(vs)
+    z = np.cos(vs)
+
+
+
+
+
+    ax.scatter(x, y ,z, color="r", marker=".")
 
     plt.show()
 
@@ -44,8 +81,8 @@ def get_uv_from_file():
 
     return np.array(u), np.array(v)
 
-def get_uv(semicircle=True):
-    ring_data = build_rings()
+def get_uv(a_deg=3.955, semicircle=True):
+    ring_data = build_rings(a_deg=a_deg)
     u, v = [], []
 
     for v_key in ring_data:
