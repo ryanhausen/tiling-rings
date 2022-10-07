@@ -2,6 +2,7 @@
 # https://math.ucr.edu/~res/math153/history07d.pdf
 # https://math.stackexchange.com/questions/1205927/how-to-calculate-the-area-covered-by-any-spherical-rectangle
 # https://www.wolframcloud.com/objects/demonstrations/TangentPlaneToASphere-source.nb
+# https://math.stackexchange.com/a/607434
 
 
 from collections import namedtuple
@@ -34,13 +35,13 @@ def main():
     ax.set_zlabel("z")
     ax.set_box_aspect([1,1,1])
 
-    up, vp = u[100], v[100]
+    up, vp = u[200], v[200]
     a *= d2r
     us, vs = list(map(np.array, zip(*product([up-a/2, up+a/2], [vp-a/2, vp+a/2]))))
 
 
 
-    xs, ys = np.meshgrid(np.linspace(-1, 1, 100), np.linspace(-1, 1, 100))
+    xs, ys = np.meshgrid(np.linspace(-1.0, 1.0, 100), np.linspace(-1.0, 1.0, 100))
 
     dfdx = lambda _x: 2*_x
     dfdy = lambda _y: 2*_y
@@ -54,17 +55,13 @@ def main():
 
     zs = (-dfdx(p.x) * (xs - p.x) - dfdy(p.y) * (ys - p.y)) / dfdz(p.z) + p.z
 
-    ax.plot_surface(xs, ys, zs)
+    ax.plot_wireframe(xs, ys, zs)
 
     x = np.cos(us) * np.sin(vs)
     y = np.sin(us) * np.sin(vs)
     z = np.cos(vs)
 
-
-
-
-
-    ax.scatter(x, y ,z, color="r", marker=".")
+    ax.scatter(x, y, z, color="r", marker=".")
 
     plt.show()
 
