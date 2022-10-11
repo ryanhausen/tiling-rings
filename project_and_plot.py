@@ -65,13 +65,19 @@ class Point:
     def dot(self, other:"Point") -> float:
         return self.xyz.dot(other.xyz)
 
+    def magnitude(self) -> float:
+        return np.norm(self.xyz, ord=2)
+
+    def angular_distance(self, other:"Point") -> float:
+        return np.arccos(self.dot(other)) / (self.r * other.r)
+
     def opposite(self) -> "Point":
         u, v = self.uv
         new_u = (u + np.pi)
-        if new_u > 2*np.pi: new_u%=(2*np.pi)
+        if new_u > 2*np.pi: new_u %= (2*np.pi)
 
         new_v = (v + np.pi)
-        if new_v > np.pi: new_v%=np.pi
+        if new_v > np.pi: new_v %= np.pi
 
         return Point(uv=np.array([new_u, new_v]))
 
@@ -103,6 +109,7 @@ class Point:
 
 
 
+d2r = np.pi / 180
 def main():
     fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(projection='3d')
@@ -130,22 +137,19 @@ def main():
 
     opp_u, opp_v = opposite(up, vp)
     up_xyz = get_xyz(opp_u, opp_v)
-    ax.scatter(*get_xyz(opp_u, opp_v), color="g")
-
+    # ax.scatter(*get_xyz(opp_u, opp_v), color="g")
     pole = np.array(get_xyz(opp_u, opp_v)) # 3,
 
-    R = 1
-    c = angular_distance([opp_u, opp_v], [us[0], vs[0]])
-    ρ = 2 * R * math.tan((c/2))
-    θ = np.pi - opp_u
-    k = np.arccos(c/2)**2
+    # R = 1
+    # c = angular_distance([opp_u, opp_v], [us[0], vs[0]])
+    # ρ = 2 * R * math.tan((c/2))
+    # θ = np.pi - opp_u
+    # k = np.arccos(c/2)**2
 
 
-
-
-    projected = [project(pole, tile_points[p,:]) for p in range(tile_points.shape[0])]
-    px, py, pz = list(zip(*projected))
-    ax.scatter(px, py, pz, color="g")
+    # projected = [project(pole, tile_points[p,:]) for p in range(tile_points.shape[0])]
+    # px, py, pz = list(zip(*projected))
+    # ax.scatter(px, py, pz, color="g")
 
 
 
@@ -189,8 +193,8 @@ def get_xyz(u, v, r=1):
 
 def project(pole:np.ndarray, point:np.ndarray):
     # return pole + (point - pole) / (1 - point.dot(pole))
-    # return (point - pole) / (1 - point.dot(pole))
-    return ((point-pole) / (point.dot(point-pole))) + pole + point
+    return (point - pole) / ( - point.dot(pole))
+
 
 
 def opposite(u, v):
