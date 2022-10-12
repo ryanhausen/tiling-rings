@@ -111,9 +111,10 @@ class Point:
 
 d2r = np.pi / 180
 def main():
-    fig = plt.figure(figsize=(20, 20))
+    fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(projection='3d')
     a = 3.955
+
     u, v = get_uv(a_deg=a, semicircle=False)
 
     x, y, z = get_xyz(u, v)
@@ -130,15 +131,51 @@ def main():
     up, vp = u[0], v[0]
 
     a *= d2r
+
     us, vs = list(map(np.array, zip(*product([up-a/2, up+a/2], [vp-a/2, vp+a/2]))))
-    tile_points = np.dstack(get_xyz(us, vs)).squeeze(0) # n, 3
-    ax.scatter(tile_points[:,0], tile_points[:,1], tile_points[:,2], color="r")
+    min_u, max_u = us.min(), us.max()
+    min_v, max_v = vs.min(), vs.max()
+    n_points = 10
+    us_range = np.linspace(min_u, max_u, num=n_points)
+    vs_range = np.linspace(min_v, max_v, num=n_points)
+    
+    us, vs = np.meshgrid(us_range, vs_range)
+    xs = np.zeros_like(us)
+    ys = np.zeros_like(us)
+    zs = np.zeros_like(us)
+    for i, j in product(range(n_points), range(n_points)):
+        x, y, z = get_xyz(us[i, j], vs[i, j])
+        xs[i, j] = x
+        ys[i, j] = y
+        zs[i, j] = z
+
+    ax.plot_surface(xs, ys, zs, color="r", alpha=0.25)
 
 
-    opp_u, opp_v = opposite(up, vp)
-    up_xyz = get_xyz(opp_u, opp_v)
+    us, vs = list(map(np.array, zip(*product([up-a, up+a], [vp-a, vp+a]))))
+    min_u, max_u = us.min(), us.max()
+    min_v, max_v = vs.min(), vs.max()
+    n_points = 10
+    us_range = np.linspace(min_u, max_u, num=n_points)
+    vs_range = np.linspace(min_v, max_v, num=n_points)
+    
+    us, vs = np.meshgrid(us_range, vs_range)
+    xs = np.zeros_like(us)
+    ys = np.zeros_like(us)
+    zs = np.zeros_like(us)
+    for i, j in product(range(n_points), range(n_points)):
+        x, y, z = get_xyz(us[i, j], vs[i, j])
+        xs[i, j] = x
+        ys[i, j] = y
+        zs[i, j] = z
+
+    ax.plot_surface(xs, ys, zs, color="g", alpha=0.25)
+
+
+    # opp_u, opp_v = opposite(up, vp)
+    # up_xyz = get_xyz(opp_u, opp_v)
     # ax.scatter(*get_xyz(opp_u, opp_v), color="g")
-    pole = np.array(get_xyz(opp_u, opp_v)) # 3,
+    # pole = np.array(get_xyz(opp_u, opp_v)) # 3,
 
     # R = 1
     # c = angular_distance([opp_u, opp_v], [us[0], vs[0]])
@@ -150,8 +187,6 @@ def main():
     # projected = [project(pole, tile_points[p,:]) for p in range(tile_points.shape[0])]
     # px, py, pz = list(zip(*projected))
     # ax.scatter(px, py, pz, color="g")
-
-
 
     # xs, ys = np.meshgrid(np.linspace(-1.0, 1.0, 100), np.linspace(-1.0, 1.0, 100))
 
